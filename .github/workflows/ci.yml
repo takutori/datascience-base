@@ -14,6 +14,14 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      - name: Sanity check
+        run: |
+          pwd
+          ls -la
+          test -f pyproject.toml || (echo "pyproject.toml not found here" && exit 1)
+          poetry --version
+          poetry check -v
+
       - name: Checkout
         uses: actions/checkout@v4
 
