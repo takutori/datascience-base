@@ -30,13 +30,9 @@ jobs:
 
       - name: Sanity check
         run: |
-          pwd && ls -la
-          test -f pyproject.toml || (echo "pyproject.toml not found in $(pwd)"; exit 1)
+          test -f pyproject.toml
           poetry --version
-          poetry check -v || true
-
-      - name: Disable package mode (CI only)
-        run: poetry config package-mode false
+          poetry check -v
 
       - name: Install deps (dev only, no GPU)
         run: poetry install --no-interaction --no-root --with dev --without gpu
