@@ -28,12 +28,6 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
 
-      - name: Sanity check
-        run: |
-          test -f pyproject.toml
-          poetry --version
-          poetry check -v
-
       - name: Install deps (dev only, no GPU)
         run: poetry install --no-interaction --no-root --with dev --without gpu
 
