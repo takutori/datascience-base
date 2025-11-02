@@ -1,58 +1,61 @@
 [project]
 name = "dsbase"
 version = "0.1.0"
-description = ""
-authors = [
-    {name = "takutori",email = "t.taichi.takutori.0214@gmail.com"}
-]
+description = "Data science base project"
+authors = [{ name = "takutori", email = "t.taichi.takutori.0214@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.12,<3.15"
-dependencies = [
-    "numpy (>=2.3.4,<3.0.0)",
-    "pandas (>=2.3.3,<3.0.0)",
-    "matplotlib (>=3.10.7,<4.0.0)",
-    "scikit-learn (>=1.7.2,<2.0.0)",
-    "jupyterlab (>=4.4.10,<5.0.0)",
-    "optuna (>=4.5.0,<5.0.0)",
-    "optuna-integration (>=4.5.0,<5.0.0)",
-    "plotly (>=6.3.1,<7.0.0)",
-    "tqdm (>=4.67.1,<5.0.0)",
-    "lightgbm (>=4.6.0,<5.0.0)",
-    "statsmodels (>=0.14.5,<0.15.0)",
-    "imbalanced-learn (>=0.14.0,<0.15.0)",
-    "polars (>=1.35.1,<2.0.0)",
-    "xgboost (>=3.1.1,<4.0.0)",
-    "catboost (>=1.2.8,<2.0.0)",
-    "pytest (>=8.4.2,<9.0.0)",
-    "black (>=25.9.0,<26.0.0)",
-    "flake8 (>=7.3.0,<8.0.0)",
-    "isort (>=7.0.0,<8.0.0)",
-    "mypy (>=1.18.2,<2.0.0)"
-]
 
+# ★ PEP 621 準拠の依存表記（カッコは使わない）
+dependencies = [
+  "numpy>=2.3.4,<3.0.0",
+  "pandas>=2.3.3,<3.0.0",
+  "matplotlib>=3.10.7,<4.0.0",
+  "scikit-learn>=1.7.2,<2.0.0",
+  "jupyterlab>=4.4.10,<5.0.0",
+  "optuna>=4.5.0,<5.0.0",
+  "optuna-integration>=4.5.0,<5.0.0",
+  "plotly>=6.3.1,<7.0.0",
+  "tqdm>=4.67.1,<5.0.0",
+  "lightgbm>=4.6.0,<5.0.0",
+  "statsmodels>=0.14.5,<0.15.0",
+  "imbalanced-learn>=0.14.0,<0.15.0",
+  "polars>=1.35.1,<2.0.0",
+  "xgboost>=3.1.1,<4.0.0",
+  "catboost>=1.2.8,<2.0.0"
+]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+# ===== 追加のPoetry設定（依存グループや外部インデックス） =====
+
+# PyTorch (CUDA 12.1) のインデックス
 [[tool.poetry.source]]
 name = "pytorch-cu121"
 url = "https://download.pytorch.org/whl/cu121"
 priority = "explicit"
 
-[tool.poetry.dependencies]
-torch = { version = "*", source = "pytorch-cu121" }
-torchvision = { version = "*", source = "pytorch-cu121" }
-torchaudio = { version = "*", source = "pytorch-cu121" }
+# 開発ツール（CIもここを入れる）
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+pytest-cov = "^5.0"
+black = "^25.0"
+flake8 = "^7.0"
+isort = "^5.13"
+mypy = "^1.10"
 
+# GPU系は別グループ（ローカルGPU環境だけで入れる）
 [tool.poetry.group.gpu.dependencies]
 torch = { version = "*", source = "pytorch-cu121" }
 torchvision = { version = "*", source = "pytorch-cu121" }
 torchaudio = { version = "*", source = "pytorch-cu121" }
 
+# フォーマッタ/リンタ設定
 [tool.black]
 line-length = 120
-target-version = ["py311"]
+target-version = ["py311"]  # 実運用に合わせて "py312" でもOK
 
 [tool.isort]
 profile = "black"
@@ -60,16 +63,8 @@ line_length = 120
 
 [tool.flake8]
 max-line-length = 120
-extend-ignore = [
-    "E203",  # Blackと競合 スライスのコロン周り
-    "W503",  # Blackと競合 二項演算子の改行
-]
-exclude = [
-    ".venv",
-    "dist",
-    "build",
-    "__pycache__",
-]
+extend-ignore = ["E203", "W503"]
+exclude = [".venv", "dist", "build", "__pycache__"]
 
 [tool.mypy]
 ignore_missing_imports = true
