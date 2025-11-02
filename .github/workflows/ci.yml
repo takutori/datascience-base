@@ -39,4 +39,4 @@ jobs:
           poetry run mypy dsbase tests --pretty --show-error-codes
 
       - name: Test
-        run: poetry run pytest -q --maxfail=1 --disable-warnings --cov=dsbase --cov-report=term-missing
+        run: poetry run pytest tests -q --maxfail=1 --disable-warnings --cov=dsbase --cov-report=term-missing
