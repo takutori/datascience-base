@@ -1,41 +1,12 @@
-name: CI
-
-on:
-  push:
-    branches: [ main, develop ]
-    paths: [ "**.py", "pyproject.toml", "poetry.lock", ".github/workflows/ci.yml" ]
-  pull_request:
-    branches: [ main, develop ]
-  workflow_dispatch:
-
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
     steps:
-      - name: Sanity check
-        run: |
-          echo "PWD: $(pwd)"
-          echo "TREE (top-level):"
-          ls -la
-          echo "----"
-          if [ ! -f pyproject.toml ]; then
-            echo "pyproject.toml not found in $(pwd)"
-            echo "GIT TREE:"
-            git ls-files | sed -n '1,200p'
-            exit 1
-          fi
-          echo "Head of pyproject.toml:"
-          sed -n '1,120p' pyproject.toml
-          echo "---- Poetry ----"
-          poetry --version
-          poetry config --list || true
-          echo "---- poetry check -v ----"
-          poetry check -v || true
-
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -49,48 +20,25 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
 
-      - name: Cache Poetry virtualenv
-        uses: actions/cache@v4
-        with:
-          path: |
-            .venv
-            ~/.cache/pip
-            ~/.cache/pypoetry
-          key: ${{ runner.os }}-py${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('poetry.lock') }}
-          restore-keys: ${{ runner.os }}-py${{ steps.setup-python.outputs.python-version }}-
+      - name: Sanity check
+        run: |
+          pwd && ls -la
+          test -f pyproject.toml || (echo "pyproject.toml not found in $(pwd)"; exit 1)
+          poetry --version
+          poetry check -v || true
 
-      # ★ GPUグループを切っている場合（おすすめ）
-      - name: Install deps (main+dev)
+      - name: Disable package mode (CI only)
+        run: poetry config package-mode false
+
+      - name: Install deps (dev only, no GPU)
         run: poetry install --no-interaction --no-root --with dev --without gpu
 
-      # ☆ もしグループ未分割なら↓に差し替え（重くなる可能性あり）
-      # - name: Install deps (all)
-      #   run: poetry install --no-interaction --no-root
-
-      - name: Show tool versions
-        run: |
-          poetry run python -V
-          poetry run black --version
-          poetry run isort --version
-          poetry run flake8 --version
-          poetry run mypy --version
-          poetry run pytest --version
-
-      - name: Lint (black/isort/flake8/mypy)
+      - name: Lint
         run: |
           poetry run black --check dsbase tests
           poetry run isort --check-only dsbase tests
           poetry run flake8 dsbase tests --count
           poetry run mypy dsbase tests --pretty --show-error-codes
 
-      - name: Test (pytest + coverage)
-        run: |
-          poetry run pytest -q --maxfail=1 --disable-warnings \
-            --cov=dsbase --cov-report=term-missing
-
-      - name: Upload coverage artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-txt
-          path: ./.coverage*
+      - name: Test
+        run: poetry run pytest -q --maxfail=1 --disable-warnings --cov=dsbase --cov-report=term-missing
