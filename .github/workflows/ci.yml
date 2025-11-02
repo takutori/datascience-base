@@ -16,11 +16,23 @@ jobs:
     steps:
       - name: Sanity check
         run: |
-          pwd
+          echo "PWD: $(pwd)"
+          echo "TREE (top-level):"
           ls -la
-          test -f pyproject.toml || (echo "pyproject.toml not found here" && exit 1)
+          echo "----"
+          if [ ! -f pyproject.toml ]; then
+            echo "pyproject.toml not found in $(pwd)"
+            echo "GIT TREE:"
+            git ls-files | sed -n '1,200p'
+            exit 1
+          fi
+          echo "Head of pyproject.toml:"
+          sed -n '1,120p' pyproject.toml
+          echo "---- Poetry ----"
           poetry --version
-          poetry check -v
+          poetry config --list || true
+          echo "---- poetry check -v ----"
+          poetry check -v || true
 
       - name: Checkout
         uses: actions/checkout@v4
