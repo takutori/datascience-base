@@ -10,7 +10,9 @@ baseは最も基盤になるリポジトリであることを示す。
 
 
 ### 仮想環境のコピー
-tomlファイルを新しいルートディレクトリにコピーした上で以下を実行
+toml, lockを新しいルートディレクトリにコピーした上で以下を実行
 ```
-poetry install --with gpu
+poetry install --no-root --with dev,gpu
 ```
+
+`--no-root`はこのライブラリをinstallしたい場合のみ外す。
