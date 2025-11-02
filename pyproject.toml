@@ -45,6 +45,10 @@ torch = { version = "*", source = "pytorch-cu121" }
 torchvision = { version = "*", source = "pytorch-cu121" }
 torchaudio = { version = "*", source = "pytorch-cu121" }
 
+[tool.poetry.group.gpu.dependencies]
+torch = { version = "*", source = "pytorch-cu121" }
+torchvision = { version = "*", source = "pytorch-cu121" }
+torchaudio = { version = "*", source = "pytorch-cu121" }
 
 [tool.black]
 line-length = 120
