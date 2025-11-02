@@ -44,3 +44,28 @@ priority = "explicit"
 torch = { version = "*", source = "pytorch-cu121" }
 torchvision = { version = "*", source = "pytorch-cu121" }
 torchaudio = { version = "*", source = "pytorch-cu121" }
+
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.flake8]
+max-line-length = 120
+extend-ignore = [
+    "E203",  # Blackと競合 スライスのコロン周り
+    "W503",  # Blackと競合 二項演算子の改行
+]
+exclude = [
+    ".venv",
+    "dist",
+    "build",
+    "__pycache__",
+]
+
+[tool.mypy]
+ignore_missing_imports = true
